@@ -4,6 +4,7 @@ import Searchbar from './Modal/Searchbar';
 import ImageGallery from './Modal/ImageGallery';
 import Loader from './Modal/Loader';
 import Api from '../services/api';
+import Button from './Modal/Button';
 
 class App extends Component {
   state = {
@@ -17,20 +18,21 @@ class App extends Component {
     isModalOpen: false,
     selectedPicture: null,
   };
-  handleFormSubmit = pictureName => {
-    this.setState({ pictureName });
-  };
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.pictureName !== this.state.pictureName) {
-      this.setState({ pictures: [], page: 1 }, this.fetchPictures);
+    if (
+      prevState.pictureName !== this.state.pictureName ||
+      prevState.page !== this.state.page
+    ) {
+      this.fetchPictures();
     }
   }
-
-  loadMorePictures = () => {
-    this.fetchPictures(window.pageYOffset);
+  handleFormSubmit = pictureName => {
+    this.setState({ pictureName, pictures: [], page: 1 });
   };
-
+  loadMorePictures = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
   fetchPictures = (currentPosition = document.documentElement.scrollTop) => {
     let { pictureName, page } = this.state;
     this.setState({ status: 'pending' });
@@ -42,7 +44,6 @@ class App extends Component {
             pictures: [...prev.pictures, ...hits],
             loadMore: this.state.page < Math.ceil(totalHits / 12),
             status: 'resolved',
-            page: prev.page + 1,
           }),
           () => {
             window.scrollTo(0, currentPosition);
@@ -62,11 +63,10 @@ class App extends Component {
     }
     if (status === 'resolved') {
       return (
-        <ImageGallery
-          pictures={pictures}
-          loadMore={loadMore}
-          onLoadMore={this.loadMorePictures}
-        />
+        <>
+          <ImageGallery pictures={pictures} />
+          {loadMore && <Button onClick={this.loadMorePictures} />}
+        </>
       );
     }
   }

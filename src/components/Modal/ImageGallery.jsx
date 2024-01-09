@@ -1,17 +1,14 @@
 import css from './Modal.module.css';
 import ImageGalleryItem from './ImageGalleryItem';
-import Button from './Button';
 
-function ImageGallery({ pictures, loadMore, onLoadMore }) {
+function ImageGallery({ pictures }) {
   return (
     <div className={css.Container}>
       <ul className={css.ImageGallery}>
-        {pictures.map(picture => {
-          return <ImageGalleryItem key={picture.id} picture={picture} />;
+        {pictures.map((picture, idx) => {
+          return <ImageGalleryItem key={idx} picture={picture} />;
         })}
       </ul>
-
-      {loadMore && <Button onClick={onLoadMore} />}
     </div>
   );
 }
